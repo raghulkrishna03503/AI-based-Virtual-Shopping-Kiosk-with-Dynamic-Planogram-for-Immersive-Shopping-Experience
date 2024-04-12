@@ -8,9 +8,10 @@ The *XR-Based Shopping Kiosk* using Planogram is an exciting project that combin
 
 
 ## How to Run
-1. Download the unity package from the given link present in the text file `UnityVRApp/packageLink.txt`
-2. Import the package to your unity project and open the scene `VR Supermarket/Final Copy 2`
-3. Now run the unity project by connecting with your *HMD*
+1. First using the `ProducerApplication/index.html` insert Planogram and Stock Price Data to firebase.
+2. Download the unity package from the given link present in the text file `UnityVRApp/packageLink.txt`
+3. Import the package to your unity project and open the scene `VR Supermarket/Final Copy 2`
+4. Now run the unity project by connecting with your *HMD*
 
 ## Video Demo
 
