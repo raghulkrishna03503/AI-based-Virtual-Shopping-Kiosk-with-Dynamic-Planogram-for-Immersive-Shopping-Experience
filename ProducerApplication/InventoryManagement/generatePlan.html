@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV File Uploader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #fileInput {
+            display: none;
+        }
+        label {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        canvas {
+            margin-top: 20px;
+            max-width: 600px;
+            max-height: 400px;
+        }
+        #writeButton {
+            display: none;
+            padding: 10px 15px;
+            background-color: green;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSV File Uploader</h1>
+    <input type="file" id="fileInput" accept=".csv">
+    <label for="fileInput" id="uploadLabel">Upload CSV File</label>
+    <div id="fileInfo"></div>
+    <div id="chartContainer"></div>
+    <button id="writeButton">Generate Plan</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyBL8rV6oPLsNvF9FHNJ9gtqGiczuLS1a90",
+  authDomain: "vrsupermarket-f6ccc.firebaseapp.com",
+  databaseURL: "https://vrsupermarket-f6ccc-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "vrsupermarket-f6ccc",
+  storageBucket: "vrsupermarket-f6ccc.appspot.com",
+  messagingSenderId: "623586692322",
+  appId: "1:623586692322:web:a7cb0b2a0c6cff1aeb62bb"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const categories = {};
+
+            lines.forEach((line, index) => {
+                if (index === 0 || line.trim() === '') return; // Skip header row and empty lines
+                const columns = line.split(',');
+                if (columns.length < 5) {
+                    return null; // Invalid format
+                }
+                const category = columns[2].trim();
+                if (!categories[category]) {
+                    categories[category] = {};
+                }
+                const brand = columns[3].trim();
+                if (!categories[category][brand]) {
+                    categories[category][brand] = { totalQuantity: 0, products: [] };
+                }
+                const quantity = parseInt(columns[4].trim());
+                categories[category][brand].totalQuantity += quantity;
+                categories[category][brand].products.push({
+                    date: columns[0].trim(),
+                    productName: columns[1].trim(),
+                    quantitySold: quantity
+                });
+            });
+
+            return categories;
+        }
+
+        async function displayCategoryData(data) {
+            const chartContainer = document.getElementById('chartContainer');
+            chartContainer.innerHTML = '';
+
+            for (const category in data) {
+                const brandsArray = [];
+                for (const brand in data[category]) {
+                    const totalQuantity = data[category][brand].totalQuantity;
+                    brandsArray.push({ brand: brand, totalQuantity: totalQuantity });
+                }
+                brandsArray.sort((a, b) => b.totalQuantity - a.totalQuantity);
+                
+                const brandLabels = brandsArray.map(brandObj => brandObj.brand);
+                const totalQuantities = brandsArray.map(brandObj => brandObj.totalQuantity);
+
+                const canvas = document.createElement('canvas');
+                chartContainer.appendChild(canvas);
+                new Chart(canvas, {
+                    type: 'bar',
+                    data: {
+                        labels: brandLabels,
+                        datasets: [{
+                            label: `${category} - Total Quantities Sold`,
+                            data: totalQuantities,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Total Quantities Sold'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Brand'
+                                }
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: `Category: ${category}`,
+                                position: 'top'
+                            },
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+            document.getElementById('writeButton').style.display = 'block';
+        }
+
+        async function writeRankDataToFirebase(data) {
+            const planogramData = {};
+            const ranks = ['first', 'second', 'third'];
+
+            for (const category in data) {
+                // Check if there are enough brands for all ranks
+                if (Object.keys(data[category]).length >= ranks.length) {
+                    const brandsArray = [];
+                    for (const brand in data[category]) {
+                        const totalQuantity = data[category][brand].totalQuantity;
+                        brandsArray.push({ brand: brand, totalQuantity: totalQuantity });
+                    }
+                    brandsArray.sort((a, b) => b.totalQuantity - a.totalQuantity);
+                    
+                    // Assign ranks to brands
+                    const rankedBrands = {};
+                    for (let i = 0; i < ranks.length; i++) {
+                        if (brandsArray[i]) {
+                            rankedBrands[ranks[i]] = brandsArray[i].brand;
+                        }
+                    }
+
+                    // Store ranked brands for the category
+                    planogramData[category] = rankedBrands;
+                } else {
+                    alert(`Not enough brands for category '${category}' to assign ranks.`);
+                }
+            }
+            
+            try {
+                await set(ref(db, 'planogramData'), planogramData);
+                alert("Plan Generated!!!");
+            } catch (error) {
+                console.error("Error writing to Firebase:", error);
+                alert("Error writing data to Firebase. Please check the console for details.");
+            }
+        }
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const contents = event.target.result;
+                    const data = parseCSV(contents);
+                    if (data) {
+                        displayCategoryData(data);
+                    } else {
+                        alert("Invalid CSV file format.");
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        document.getElementById('writeButton').addEventListener('click', () => {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const contents = event.target.result;
+                    const data = parseCSV(contents);
+                    if (data) {
+                        writeRankDataToFirebase(data);
+                    } else {
+                        alert("Invalid CSV file format.");
+                    }
+                };
+                reader.readAsText(file);
+            } else {
+                alert("Please upload a CSV file first.");
+            }
+        });
+    </script>
+</body>
+</html>

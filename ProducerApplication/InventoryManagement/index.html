@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splash Screen</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+
+        *{
+            background-color: black;
+        }
+        @keyframes logoAnimation {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .logo {
+            animation: logoAnimation 2s ease-in-out infinite;
+            margin-top: 100px;
+        }
+
+        p{
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: larger;
+            font-weight: bolder;
+            margin-top: 75px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="splash-screen">
+        <center>
+            <img src="logo.png" alt="Your Logo" class="logo">
+            <p>Loading...</p>
+        </center>
+    </div>
+
+    <script>
+        setTimeout(function() {
+            window.location.href = 'dashboard.html';
+        }, 5000);
+    </script>
+</body>
+</html>

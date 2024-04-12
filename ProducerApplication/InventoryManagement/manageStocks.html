@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Price and Stock Uploader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #fileInput {
+            display: none;
+        }
+        label {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        input[type="number"] {
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Product Price and Stock Uploader</h1>
+    <input type="file" id="fileInput" accept=".csv">
+    <label for="fileInput" id="uploadLabel">Upload CSV File</label>
+    <div id="fileInfo"></div>
+    <div id="tableContainer"></div>
+    <button id="updateStockButton" style="display: none;">Update Stock</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyBL8rV6oPLsNvF9FHNJ9gtqGiczuLS1a90",
+  authDomain: "vrsupermarket-f6ccc.firebaseapp.com",
+  databaseURL: "https://vrsupermarket-f6ccc-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "vrsupermarket-f6ccc",
+  storageBucket: "vrsupermarket-f6ccc.appspot.com",
+  messagingSenderId: "623586692322",
+  appId: "1:623586692322:web:a7cb0b2a0c6cff1aeb62bb"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const products = {};
+
+            lines.forEach((line, index) => {
+                if (index === 0 || line.trim() === '') return; // Skip header row and empty lines
+                const columns = line.split(',');
+                if (columns.length > 3) {
+                    return null;
+                }
+                const productName = columns[0].trim();
+                const price = parseFloat(columns[1].trim());
+                const stock = parseInt(columns[2].trim());
+                if (!products[productName]) {
+                    products[productName] = { price: price, stock: stock};
+                }
+            });
+
+            return products;
+        }
+
+        function displayProductData(data) {
+            const tableContainer = document.getElementById('tableContainer');
+            tableContainer.innerHTML = '';
+
+            const table = document.createElement('table');
+            const headerRow = table.insertRow();
+            const productNameHeader = headerRow.insertCell(0);
+            const priceHeader = headerRow.insertCell(1);
+            const stockHeader = headerRow.insertCell(2);
+            productNameHeader.textContent = 'Product Name';
+            priceHeader.textContent = 'Price';
+            stockHeader.textContent = 'Stock';
+
+            for (const productName in data) {
+                const row = table.insertRow();
+                const productNameCell = row.insertCell(0);
+                const priceCell = row.insertCell(1);
+                const stockCell = row.insertCell(2);
+                productNameCell.textContent = productName;
+                const priceInput = document.createElement('input');
+                priceInput.type = 'number';
+                priceInput.value = data[productName].price;
+                priceInput.classList.add('priceInput');
+                priceCell.appendChild(priceInput);
+                const stockInput = document.createElement('input');
+                stockInput.type = 'number';
+                stockInput.value = data[productName].stock;
+                stockInput.classList.add('stockInput');
+                stockCell.appendChild(stockInput);
+            }
+
+            tableContainer.appendChild(table);
+            document.getElementById('updateStockButton').style.display = 'block';
+        }
+
+        function updateStockInFirebase(data) {
+            const productData = {};
+            const priceInputs = document.querySelectorAll('.priceInput');
+            const stockInputs = document.querySelectorAll('.stockInput');
+            priceInputs.forEach((input, index) => {
+                const productName = input.parentNode.parentNode.cells[0].textContent;
+                const price = parseFloat(input.value);
+                const stock = parseInt(stockInputs[index].value);
+                productData[productName] = { price: price, stock: stock };
+            });
+
+            try {
+                set(ref(db, 'productStockandPrice'), productData);
+                alert("Product price and stock updated in Firebase!");
+            } catch (error) {
+                console.error("Error updating product price and stock:", error);
+                alert("Error updating product price and stock in Firebase. Please check the console for details.");
+            }
+        }
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const contents = event.target.result;
+                    const data = parseCSV(contents);
+                    if (data) {
+                        displayProductData(data);
+                    } else {
+                        alert("Invalid CSV file format.");
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        document.getElementById('updateStockButton').addEventListener('click', () => {
+            updateStockInFirebase();
+        });
+    </script>
+</body>
+</html>
