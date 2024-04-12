@@ -6,8 +6,6 @@ The *XR-Based Shopping Kiosk* using Planogram is an exciting project that combin
 
 ![Developed By Raghul Yadhav K](https://github.com/raghulkrishna03503/XR-Based-Shopping-Kiosk-using-Planogram/assets/108167463/b2b791f8-2f96-414b-b434-f110e790d3dd)
 
-## Project File System Explanation
-
 ## Video Demo
 
 https://drive.google.com/file/d/1deq3YxmLBVaJVUIegz1ktbW5wNWZ1cqY/view?usp=sharing
