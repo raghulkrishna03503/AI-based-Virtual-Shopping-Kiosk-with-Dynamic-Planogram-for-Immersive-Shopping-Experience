@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+    <style>
+        body {
+            background: url("Background.jpg");
+        }
+
+        .welcome-message {
+            font-size: 50px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .button-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .button {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: transparent;
+            color: white;
+            border-radius: 15px;
+            border: 2px solid white;
+            cursor: pointer;
+            font-size: 24px;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: white;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="welcome-message">
+            <p>Welcome to your Dashboard!</p>
+        </div>
+        <div class="button-container">
+            <button class="button" onclick="generatePlan()">Generate Plan<br>based on<br><b>Boosting Profit</b></button>
+            <button class="button" onclick="manageStocks()">Manage<br><b>Stocks</b></button>
+            <!-- <button id="toggleButton" class="button" onclick="toggleShopEntry()" value="yes">Disable Shop Entry</button> -->
+        </div>
+    </div>
+
+<!-- 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBL8rV6oPLsNvF9FHNJ9gtqGiczuLS1a90",
+            authDomain: "vrsupermarket-f6ccc.firebaseapp.com",
+            databaseURL: "https://vrsupermarket-f6ccc-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "vrsupermarket-f6ccc",
+            storageBucket: "vrsupermarket-f6ccc.appspot.com",
+            messagingSenderId: "623586692322",
+            appId: "1:623586692322:web:a7cb0b2a0c6cff1aeb62bb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+
+        const db = getDatabase(app);
+
+        document.getElementById("toggleButton").addEventListener('click', function(e){
+            set(ref(db, 'shopEntry'),
+            {
+                canEnter: document.getElementById("toggleButton").value
+            });
+        });
+    </script> -->
+    <script>
+
+        // var shopEntryEnabled = true;
+
+        // function toggleShopEntry() {
+        //     shopEntryEnabled = !shopEntryEnabled;
+        //     var button = document.getElementById('toggleButton');
+        //     if (shopEntryEnabled) {
+        //         button.textContent = 'Disable Shop Entry';
+        //         button.value = 'yes';
+        //         window.alert("Entry to shop is Enabled");
+        //     } else {
+        //         button.textContent = 'Enable Shop Entry';
+        //         button.value = 'no';
+        //         window.alert("Entry to shop is Disabled");
+        //     }
+        // }
+
+        function generatePlan() {
+            window.location.href = 'generatePlan.html';
+        }
+
+        function manageStocks() {
+            window.location.href = 'manageStocks.html';
+        }
+        
+    </script>
+</body>
+</html>
