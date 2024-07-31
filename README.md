@@ -1,6 +1,6 @@
-# **XR Based Shopping Kiosk using Planogram**
+# **AI-based Virtual Shopping Kiosk with Dynamic Planogram for Immersive Shopping Experience**
 
-The *XR-Based Shopping Kiosk* using Planogram is an exciting project that combines **extended reality (XR) technology** with *planogram visualization* to revolutionize the shopping experience. By wearing **VR headsets**, customers will be able to view a *virtual representation* of a retail store. The kiosk will leverage **planogram data**, which is a visual representation of how products should be displayed on store shelves, to recreate a virtual store environment. The planogram data will be generated using *previous sales data analytics* of the store.
+The *AI-based Virtual Shopping Kiosk with Dynamic Planogram for Immersive Shopping Experience* using Planogram is an exciting project that combines **virtual reality technology** with *planogram visualization* to revolutionize the shopping experience. By wearing **VR headsets**, customers will be able to view a *virtual representation* of a retail store. The kiosk will leverage **planogram data**, which is a visual representation of how products should be displayed on store shelves, to recreate a virtual store environment. The planogram data will be generated using *previous sales data analytics* of the store.
 
 ## System Architecture
 
